@@ -7,13 +7,34 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+import SnapKit
+
+final class ViewController: UIViewController {
+    private let textView = {
+        let textView = UITextView()
+        textView.layer.borderColor = UIColor.black.cgColor
+        textView.layer.borderWidth = 1
+        textView.layer.cornerRadius = 5
+        textView.clipsToBounds = true
+        return textView
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+
+        setAttributes()
+        configureSubviewLayout()
     }
 
+    private func setAttributes() {
+        view.backgroundColor = .white
+    }
 
+    private func configureSubviewLayout() {
+        view.addSubview(textView)
+
+        textView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide).inset(10)
+        }
+    }
 }
-
