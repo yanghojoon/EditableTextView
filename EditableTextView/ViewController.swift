@@ -22,6 +22,10 @@ final class ViewController: UIViewController {
         return textView
     }()
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,10 +36,27 @@ final class ViewController: UIViewController {
     private func setAttributes() {
         view.backgroundColor = .white
         setTextViewAttributes()
+        setupKeyboardNotifications()
     }
 
     private func setTextViewAttributes() {
         textView.delegate = self
+    }
+
+    private func setupKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
 
     private func configureSubviewLayout() {
@@ -43,6 +64,37 @@ final class ViewController: UIViewController {
 
         textView.snp.makeConstraints {
             $0.edges.equalTo(view.safeAreaLayoutGuide).inset(10)
+        }
+    }
+
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return
+        }
+
+        let keyboardHeight = keyboardFrame.height
+        let inset = keyboardHeight - view.safeAreaInsets.bottom + 10
+        let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+
+        UIView.animate(withDuration: animationDuration) { [weak self] in
+            guard let self else { return }
+            self.textView.snp.updateConstraints {
+                $0.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(inset)
+            }
+            self.view.layoutIfNeeded()
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+
+
+        UIView.animate(withDuration: animationDuration) { [weak self] in
+            guard let self else { return }
+            self.textView.snp.updateConstraints {
+                $0.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(10)
+            }
+            self.view.layoutIfNeeded()
         }
     }
 }
