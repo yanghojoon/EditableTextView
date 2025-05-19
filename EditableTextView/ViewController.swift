@@ -64,8 +64,16 @@ extension ViewController: UITextViewDelegate {
                 self?.toggleItalicStyle(in: range)
             }
 
+            let changeTextColorAction = UIAction(title: "글자색 변경") { [weak self] _ in
+                guard let self else { return }
+                let picker = UIColorPickerViewController()
+                picker.delegate = self
+                self.present(picker, animated: true, completion: nil)
+            }
+
             additionalActions.append(boldAction)
             additionalActions.append(italicAction)
+            additionalActions.append(changeTextColorAction)
         }
 
         return UIMenu(children: suggestedActions + additionalActions)
@@ -103,6 +111,14 @@ extension ViewController: UITextViewDelegate {
         let selectedTextRange = textView.selectedTextRange
         textView.attributedText = attributedText
         textView.selectedTextRange = selectedTextRange
+    }
+}
+
+extension ViewController: UIColorPickerViewControllerDelegate {
+    func colorPickerViewControllerDidSelectColor(
+        _ viewController: UIColorPickerViewController
+    ) {
+        applyAttribute(.foregroundColor, value: viewController.selectedColor)
     }
 
     private func applyAttribute(_ key: NSAttributedString.Key, value: Any) {
