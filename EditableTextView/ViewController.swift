@@ -71,7 +71,6 @@ extension ViewController: UITextViewDelegate {
         return UIMenu(children: suggestedActions + additionalActions)
     }
 
-    // 볼드체 토글 메서드
     private func toggleBoldStyle(in range: NSRange) {
         let attributedText = NSMutableAttributedString(attributedString: textView.attributedText)
 
@@ -86,52 +85,23 @@ extension ViewController: UITextViewDelegate {
             }
         }
 
-        // 선택 범위 저장
         let selectedTextRange = textView.selectedTextRange
-
-        // 스타일 적용
         textView.attributedText = attributedText
-
-        // 선택 범위 복원
         textView.selectedTextRange = selectedTextRange
     }
 
-    // 이탤릭체 토글 메서드 - 수정된 버전
     private func toggleItalicStyle(in range: NSRange) {
         let attributedText = NSMutableAttributedString(attributedString: textView.attributedText)
 
         attributedText.enumerateAttribute(.font, in: range, options: []) { (value, range, stop) in
-            if let font = value as? UIFont {
-                // 폰트 기술자에 이탤릭 특성 추가
-                var traits = font.fontDescriptor.symbolicTraits
-                traits.insert(.traitItalic)
-
-                let matrix = CGAffineTransform(a: 1, b: 0, c: 0.25, d: 1, tx: 0, ty: 0)
-                let descriptor = font.fontDescriptor.withMatrix(matrix)
-                let newFont = UIFont(descriptor: descriptor, size: font.pointSize)
-                attributedText.addAttribute(.font, value: newFont, range: range)
-            } else {
-                // 폰트가 없는 경우 기본 이탤릭체 시도
-                if let descriptor = UIFont.systemFont(ofSize: 14).fontDescriptor.withSymbolicTraits(.traitItalic) {
-                    let newFont = UIFont(descriptor: descriptor, size: 14)
-                    attributedText.addAttribute(.font, value: newFont, range: range)
-                } else {
-                    // 이것도 실패하면 변환 행렬 사용
-                    let matrix = CGAffineTransform(a: 1, b: 0, c: 0.25, d: 1, tx: 0, ty: 0)
-                    let descriptor = UIFont.systemFont(ofSize: 14).fontDescriptor.withMatrix(matrix)
-                    let newFont = UIFont(descriptor: descriptor, size: 14)
-                    attributedText.addAttribute(.font, value: newFont, range: range)
-                }
-            }
+            let matrix = CGAffineTransform(a: 1, b: 0, c: 0.25, d: 1, tx: 0, ty: 0)
+            let descriptor = UIFont.systemFont(ofSize: 14).fontDescriptor.withMatrix(matrix)
+            let newFont = UIFont(descriptor: descriptor, size: 14)
+            attributedText.addAttribute(.font, value: newFont, range: range)
         }
 
-        // 선택 범위 저장
         let selectedTextRange = textView.selectedTextRange
-
-        // 스타일 적용
         textView.attributedText = attributedText
-
-        // 선택 범위 복원
         textView.selectedTextRange = selectedTextRange
     }
 
